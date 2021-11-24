@@ -2,7 +2,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-%matplotlib inline
 
 # We will use astropy's WCS and ZScaleInterval for plotting
 from astropy.wcs import WCS
@@ -81,7 +80,7 @@ def make_postage_stamps(objects, cutout_size=100):
     
     cutout_extent = lsst.geom.ExtentI(cutout_size, cutout_size)
     
-    radec = lsst.geom.SpherePoint(obj["ra"], obj["dec"], lsst.geom.degrees)
+    radec = lsst.geom.SpherePoint(objects["ra"], objects["dec"], lsst.geom.degrees)
     center = skymap.findTract(radec).getWcs().skyToPixel(radec)
     bbox = lsst.geom.BoxI(lsst.geom.Point2I((center.x - cutout_size*0.5, center.y - cutout_size*0.5)), cutout_extent)
 
