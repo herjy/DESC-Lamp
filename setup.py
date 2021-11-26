@@ -20,7 +20,7 @@ setuptools.setup(
         "License :: BSD 3-Clause License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "lamp"},
-    packages=setuptools.find_packages(where="lamp"),
+    package_dir={"": "desclamp"},
+    packages=setuptools.find_packages(where="desclamp"),
     python_requires=">=3.6",
 )
