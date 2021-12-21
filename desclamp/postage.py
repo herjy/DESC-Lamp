@@ -36,6 +36,19 @@ def catalog_setup(dc2_data_version):
         butler = desc_dc2_dm_data.get_butler(dc2_data_version)
         
         return cat, butler
+    
+class Cutout:
+    """A class that describes cutout of lens candidates and all the catalog level 
+    information necessary to identify thhe object as well as lensing-relatted inforrmation."""
+    def __init__(self, images, wcs, catalog):
+        
+        self.images = images
+        self.wcs = wcs
+        self.catalog = catalog
+    
+    def synthetic_shot(self,image):
+        """ A method to do synthetic injection of a lensed source in the cutout"""
+        pass
 
 class Candidates:
     """ Class that handles catalog querries. Fetches postage stamps and light curves of samples of images and allows visualization """
@@ -55,6 +68,7 @@ class Candidates:
             list of tract numbers. Used to restrict the search to a small number of tracts.
         """
         # The minimum set of infomation needed about objects in the catalog
+        # This will need to included lensing information att some point.
         
         columns_to_get = ["objectId", "ra", "dec", "tract", "patch"]
         if columns is not None:
@@ -71,7 +85,7 @@ class Candidates:
         objects = self.cat.get_quantities(columns_to_get, filters=query, native_filters=filters)
         
         # make it a pandas data frame for the ease of manipulation.
-        # Objects are nont made attributes of the class in case the use wants postage stamps for a smaller set of objects
+        # Objects are nont made attributes of the class in case the user wants postage stamps for a smaller set of objects
         objects = pd.DataFrame(objects)
         return objects
 
@@ -91,7 +105,7 @@ class Candidates:
         skymap = self.butler.get('deepCoadd_skyMap')
         
         cutout_extent = lsst.geom.ExtentI(cutout_size, cutout_size)
-        cutouts = {"images":[], "wcs":[], "GCR":[]}
+        cutouts = []
         for (_, object_this) in objects.iterrows():
             radec = lsst.geom.SpherePoint(object_this["ra"], object_this["dec"], lsst.geom.degrees)
             center = skymap.findTract(radec).getWcs().skyToPixel(radec)
@@ -103,26 +117,30 @@ class Candidates:
                               patch=object_this["patch"], 
                               filter=band
                              ) for band in bands]
-            cutouts["images"].append(cutout)
-            cutouts["GCR"].append(object_this)
-            cutouts["wcs"].append(cutout[0].getWcs().getFitsMetadata())
+            cutouts.append(Cutout(cutout, cutout[0].getWcs().getFitsMetadata(), object_this))
         
         return cutouts
 
-    def display_cutouts(self, cutouts, cutout_size=100):
+    def display_cutouts(self, cutouts, cutout_size=100, data_range = 2, q = 8):
         """ Displays RGB image of cutouts on a mosaic
         """
-        n = len(cutouts["images"])
+        n = len(cutouts)
 
         fig = plt.figure(figsize=(36, 36), dpi=100)
-        gs = plt.GridSpec(int(np.sqrt(n)+1), int(np.sqrt(n)+1), fig)
+        if int(np.sqrt(n))**2 == n:
+            l = int(np.sqrt(n))
+        else:
+            l = int(np.sqrt(n)+1)
+        
+        gs = plt.GridSpec(l, l, fig)
         
         for i in range(n):
-            image = cutouts["images"][i]
-            image_rgb = rgb.makeRGB(*image, dataRange = 2, Q=8)
+            cutout = cutouts[i]
+            image = cutout.images
+            image_rgb = rgb.makeRGB(*image, dataRange = data_range, Q=q)
             del image  # let gc save some memory for us
     
-            ax = plt.subplot(gs[i], projection=WCS(cutouts["wcs"][i]), label=str(cutouts["GCR"][i]["objectId"]))
+            ax = plt.subplot(gs[i], projection=WCS(cutout.wcs), label=str(cutout.catalog["objectId"]))
             ax.imshow(image_rgb, origin='lower')
             del image_rgb  # let gc save some memory for us
         
