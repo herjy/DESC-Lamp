@@ -2,10 +2,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import copy
 
 # We will use astropy's WCS and ZScaleInterval for plotting
 from astropy.wcs import WCS
-from astropy.visualization import ZScaleInterval
 # Also to convert sky coordinates
 
 
@@ -13,6 +13,8 @@ from astropy.visualization import ZScaleInterval
 import lsst.geom
 import lsst.afw.display as afwDisplay
 import lsst.afw.display.rgb as rgb
+# Source injection
+from lsst.pipe.tasks.insertFakes import _add_fake_sources
 
 # And also DESC packages to get the data path
 import GCRCatalogs
@@ -40,15 +42,26 @@ def catalog_setup(dc2_data_version):
 class Cutout:
     """A class that describes cutout of lens candidates and all the catalog level 
     information necessary to identify thhe object as well as lensing-relatted inforrmation."""
-    def __init__(self, images, wcs, catalog):
-        
-        self.images = images
-        self.wcs = wcs
+    def __init__(self, exposure, catalog):
+        self.exposure = exposure
         self.catalog = catalog
     
-    def synthetic_shot(self,image):
-        """ A method to do synthetic injection of a lensed source in the cutout"""
-        pass
+    def inject(self, lensed_source, spectra):
+        """ A method to do synthetic injection of a lensed source in the cutout
+        Parameters
+        ----------
+        lensed_source: a galsim object or an array
+            An image of a lensed source to inject.
+        """
+        assert len(spectra)==len(self.exposure)
+        radec = lsst.geom.SpherePoint(self.catalog["ra"], self.catalog["dec"], lsst.geom.degrees)
+        new_exp = copy.deepcopy(self.exposure)
+        for i,e in enumerate(new_exp):
+            _add_fake_sources(e, [(radec, lensed_source.withFlux(spectra[i]))])
+        
+        return Cutout(new_exp, self.catalog)
+    
+        
 
 class Candidates:
     """ Class that handles catalog querries. Fetches postage stamps and light curves of samples of images and allows visualization """
@@ -82,14 +95,14 @@ class Candidates:
             filters = f"(tract == {tracts[0]})"
             for t in tracts[1:]:
                 filters +=  f" | (tract == {t})"
-        objects = self.cat.get_quantities(columns_to_get, filters=query, native_filters=filters)
+        objects = self.cat.get_quantities(columns_to_get, filters=GCRQuery(*query), native_filters=filters)
         
         # make it a pandas data frame for the ease of manipulation.
         # Objects are nont made attributes of the class in case the user wants postage stamps for a smaller set of objects
         objects = pd.DataFrame(objects)
         return objects
 
-    def make_postage_stamps(self, objects, cutout_size=100, bands = 'irg'):
+    def make_postage_stamps(self, objects, cutout_size=100, bands = 'irg', inject=None):
         """ Extracts a coadd postage stamp of an object from the catalog
         
         Parameters
@@ -108,16 +121,21 @@ class Candidates:
         cutouts = []
         for (_, object_this) in objects.iterrows():
             radec = lsst.geom.SpherePoint(object_this["ra"], object_this["dec"], lsst.geom.degrees)
+
             center = skymap.findTract(radec).getWcs().skyToPixel(radec)
             bbox = lsst.geom.BoxI(lsst.geom.Point2I((center.x - cutout_size*0.5, center.y - cutout_size*0.5)), cutout_extent)
         
-            cutout = [self.butler.get("deepCoadd_sub", 
+            exposure = [self.butler.get("deepCoadd_sub", 
                               bbox=bbox, 
                               tract=object_this["tract"], 
                               patch=object_this["patch"], 
                               filter=band
                              ) for band in bands]
-            cutouts.append(Cutout(cutout, cutout[0].getWcs().getFitsMetadata(), object_this))
+            
+            new_cutout = Cutout(exposure, object_this)
+            cutouts.append(new_cutout)
+            cutouts.append(new_cutout.inject(inject, (200,250,250)))
+            del new_cutout
         
         return cutouts
 
@@ -136,11 +154,14 @@ class Candidates:
         
         for i in range(n):
             cutout = cutouts[i]
-            image = cutout.images
+            image = cutout.exposure
             image_rgb = rgb.makeRGB(*image, dataRange = data_range, Q=q)
             del image  # let gc save some memory for us
     
-            ax = plt.subplot(gs[i], projection=WCS(cutout.wcs), label=str(cutout.catalog["objectId"]))
+            ax = plt.subplot(gs[i], 
+                             projection=WCS(cutout.exposure[0].getWcs().getFitsMetadata()), 
+                             label=str(cutout.catalog["objectId"])
+                            )
             ax.imshow(image_rgb, origin='lower')
             del image_rgb  # let gc save some memory for us
         
@@ -149,4 +170,3 @@ class Candidates:
                 c.set_axislabel('', size=0)
             
         pass
-    
