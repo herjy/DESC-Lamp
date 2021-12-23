@@ -14,7 +14,7 @@ def Lensed_source(Cutout):
         self.spectrum = spectrum
         self.gso = gsobject
         
-    def from_gso(image, wcs = None, pix = None):
+    def from_gso(self, image, wcs = None, pix = None):
         """ Declares a Lensed source from an image.
         Parameters
         ----------
