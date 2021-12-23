@@ -4,7 +4,7 @@ astropy
 matplotlib
 lenstronomy
 galsim
-GCRCatalogs
+#GCRCatalogs
 pandas
 copy
 
