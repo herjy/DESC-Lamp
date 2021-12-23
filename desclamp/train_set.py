@@ -45,8 +45,7 @@ class TrainSet(Candidates):
         if self.num >= self.batchsize:
             raise StopIteration()
         new_index = np.max([self.index+self.batch_size, self.n_samples])
-        cutouts = make_postage_stamps(self, 
-                                      self.objects[self.index, new_index], 
+        cutouts = self.make_postage_stamps(self.objects[self.index, new_index], 
                                       cutout_size=100, 
                                       bands = 'irg', 
                                       inject=None)
