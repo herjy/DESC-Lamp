@@ -46,7 +46,7 @@ class TrainSet(Candidates):
             raise StopIteration()
         new_index = np.max([self.index+self.batch_size, self.n_samples])
         cutouts = make_postage_stamps(self, 
-                                      objects[self.index, new_index], 
+                                      self.objects[self.index, new_index], 
                                       cutout_size=100, 
                                       bands = 'irg', 
                                       inject=None)
