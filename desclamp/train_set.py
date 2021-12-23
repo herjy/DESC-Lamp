@@ -1,4 +1,5 @@
 from .postage import Candidates
+import numpy as np
 
 class TrainSet(Candidates):
     """ Generates training sets for strong gravitational lens images. 
@@ -44,7 +45,11 @@ class TrainSet(Candidates):
         if self.num >= self.batchsize:
             raise StopIteration()
         new_index = np.max([self.index+self.batch_size, self.n_samples])
-        cutouts = make_postage_stamps(self, objects[self.index, new_index], cutout_size=100, bands = 'irg', inject=None)
+        cutouts = make_postage_stamps(self, 
+                                      objects[self.index, new_index], 
+                                      cutout_size=100, 
+                                      bands = 'irg', 
+                                      inject=None)
         return cutouts
         
 
