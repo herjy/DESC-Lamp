@@ -3,9 +3,9 @@ numpy>=1.17
 astropy
 matplotlib
 lenstronomy
-galsim
+#galsim
 #GCRCatalogs
-pandas
+#pandas
 copy
 
 # For tests 
