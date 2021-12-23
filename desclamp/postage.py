@@ -6,7 +6,6 @@ import copy
 
 # We will use astropy's WCS and ZScaleInterval for plotting
 from astropy.wcs import WCS
-from astropy.visualization import ZScaleInterval
 # Also to convert sky coordinates
 
 

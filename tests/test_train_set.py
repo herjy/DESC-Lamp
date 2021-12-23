@@ -4,8 +4,6 @@ import pytest
 
 from desclamp import train_set
 
-class TestTrainset(object):
-    def initialise
     
     
     

@@ -1,3 +1,5 @@
+from .postage import Candidates
+
 class TrainSet(Candidates):
     """ Generates training sets for strong gravitational lens images. 
     Lensed images are generated using source injection of lensed sources.
