@@ -6,7 +6,7 @@ lenstronomy
 #galsim
 #GCRCatalogs
 #pandas
-copy
+#copy
 
 # For tests 
 pytest
