@@ -30,6 +30,6 @@ def Lensed_source(Cutout):
             assert wcs is not None
             
         
-        gsobject = galsim.InterpolatedImage(galsim.Image(image_high_res_lensed), scale = pix)
+        gsobject = galsim.InterpolatedImage(galsim.Image(self.gso), scale = pix)
         
         
