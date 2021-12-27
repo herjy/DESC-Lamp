@@ -2,16 +2,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import copy
 
 # We will use astropy's WCS and ZScaleInterval for plotting
 from astropy.wcs import WCS
 # Also to convert sky coordinates
 
-
+import galsim
 # We will use several stack functions
 import lsst.geom
-import lsst.afw.display as afwDisplay
 import lsst.afw.display.rgb as rgb
 # Source injection
 from lsst.pipe.tasks.insertFakes import _add_fake_sources
@@ -55,9 +53,10 @@ class Cutout:
         """
         assert len(spectra)==len(self.exposure)
         radec = lsst.geom.SpherePoint(self.catalog["ra"], self.catalog["dec"], lsst.geom.degrees)
-        new_exp = copy.deepcopy(self.exposure)
+        new_exp = self.exposure.copy()
+        lensed_obj = galsim.InterpolatedImage(lensed_source, scale = 0.05)
         for i,e in enumerate(new_exp):
-            _add_fake_sources(e, [(radec, lensed_source.withFlux(spectra[i]))])
+            _add_fake_sources(e, [(radec, lensed_obj.withFlux(spectra[i]))])
         
         return Cutout(new_exp, self.catalog)
     
@@ -66,10 +65,12 @@ class Cutout:
 class Candidates:
     """ Class that handles catalog querries. Fetches postage stamps and light curves of samples of images and allows visualization """
     
-    def __init__(self, dc2_data_version):
+    def __init__(self, dc2_data_version, skymap='deepCoadd_skyMap'):
         
         self.cat, self.butler = catalog_setup(dc2_data_version)
-
+        self.skymap = self.butler.get(skymap)
+        
+        
     def catalog_query(self, query, columns = None, tracts = None):
         """ Submits a query and a selection to the catalog. Extract relevant information from catalogs.
         
@@ -102,7 +103,7 @@ class Candidates:
         objects = pd.DataFrame(objects)
         return objects
 
-    def make_postage_stamps(self, objects, cutout_size=100, bands = 'irg', inject=None):
+    def make_postage_stamps(self, objects, cutout_size=100, bands = 'irg'):
         """ Extracts a coadd postage stamp of an object from the catalog
         
         Parameters
@@ -115,14 +116,13 @@ class Candidates:
             spectral for which patches have to extracted. Default is 'irg'.
         
         """
-        skymap = self.butler.get('deepCoadd_skyMap')
         
         cutout_extent = lsst.geom.ExtentI(cutout_size, cutout_size)
         cutouts = []
         for (_, object_this) in objects.iterrows():
             radec = lsst.geom.SpherePoint(object_this["ra"], object_this["dec"], lsst.geom.degrees)
 
-            center = skymap.findTract(radec).getWcs().skyToPixel(radec)
+            center = self.skymap.findTract(radec).getWcs().skyToPixel(radec)
             bbox = lsst.geom.BoxI(lsst.geom.Point2I((center.x - cutout_size*0.5, center.y - cutout_size*0.5)), cutout_extent)
         
             exposure = [self.butler.get("deepCoadd_sub", 
@@ -133,23 +133,21 @@ class Candidates:
                              ) for band in bands]
             
             new_cutout = Cutout(exposure, object_this)
-            cutouts.append(new_cutout)
-            cutouts.append(new_cutout.inject(inject, (200,250,250)))
-            del new_cutout
+            cutouts.append(new_cutout) 
         
         return cutouts
-
+    
     def display_cutouts(self, cutouts, cutout_size=100, data_range = 2, q = 8):
         """ Displays RGB image of cutouts on a mosaic
         """
         n = len(cutouts)
 
         fig = plt.figure(figsize=(36, 36), dpi=100)
-        if int(np.sqrt(n))**2 == n:
+        if int(np.sqrt(n))**2 == int(n):
             l = int(np.sqrt(n))
         else:
             l = int(np.sqrt(n)+1)
-        
+
         gs = plt.GridSpec(l, l, fig)
         
         for i in range(n):
