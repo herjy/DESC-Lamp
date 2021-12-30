@@ -6,7 +6,6 @@ lenstronomy
 galsim
 git+git://github.com/LSSTDESC/gcr-catalogs#egg=GCRCatalogs
 pandas
-copy
 
 # For tests 
 pytest
