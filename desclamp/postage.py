@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import copy
 # We will use astropy's WCS and ZScaleInterval for plotting
 from astropy.wcs import WCS
 # Also to convert sky coordinates
@@ -53,7 +53,7 @@ class Cutout:
         """
         assert len(spectra)==len(self.exposure)
         radec = lsst.geom.SpherePoint(self.catalog["ra"], self.catalog["dec"], lsst.geom.degrees)
-        new_exp = self.exposure.copy()
+        new_exp = copy.deepcopy(self.exposure)
         lensed_obj = galsim.InterpolatedImage(lensed_source, scale = 0.05)
         for i,e in enumerate(new_exp):
             _add_fake_sources(e, [(radec, lensed_obj.withFlux(spectra[i]))])
@@ -154,7 +154,6 @@ class Candidates:
             cutout = cutouts[i]
             image = cutout.exposure
             image_rgb = rgb.makeRGB(*image, dataRange = data_range, Q=q)
-            del image  # let gc save some memory for us
     
             ax = plt.subplot(gs[i], 
                              projection=WCS(cutout.exposure[0].getWcs().getFitsMetadata()), 

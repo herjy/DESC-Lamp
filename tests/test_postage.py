@@ -24,11 +24,7 @@ class TestPostage(object):
             "snr_i_cModel > 10",
             )
         self.objects = self.candidates.catalog_query(bright_galaxy_query, tracts=[4639])
-        
-        lensed = np.zeros((10,10))
-        lensed[4,4]=1
-        gsobj = galsim.InterpolatedImage(galsim.Image(lensed), scale = 0.05)
-        self.cutouts = self.candidates.make_postage_stamps(self.objects.loc[:1], cutout_size=100, bands = 'irg', inject=gsobj)
+        self.cutouts = self.candidates.make_postage_stamps(self.objects.loc[:1], cutout_size=100, bands = 'irg')
         
     def test_candidates(self):
         assert len(self.candidates.cat) == 147088478
@@ -38,15 +34,23 @@ class TestPostage(object):
         npt.assert_almost_equal(self.objects.loc[0]["dec"], -31.207443496107427)
                   
         
-        
     def test_cutouts(self):
         
         npt.assert_almost_equal(self.cutouts[0].catalog["ra"], 56.99553034462916)
         npt.assert_almost_equal(self.cutouts[0].catalog["dec"], -31.207443496107427)
                   
         
+    def test_inject(self):
         
-        
+        lensed = np.zeros((10,10))
+        lensed[4,4]=1
+        gsobj = galsim.Image(lensed)
+        spectra = (100,200,300)
+        for i in range(3):
+            injected = self.cutouts[0].inject(gsobj, spectra).exposure[i].maskedImage.image.array
+            image = self.cutouts[0].exposure[i].maskedImage.image.array
+            # 1% flux error is quite high but it seems to be the number for now. I need to investigate this
+            npt.assert_almost_equal(np.sum(injected-image), np.sum(lensed)*spectra[i], -1)
         
     def tetst_display(self):
         
