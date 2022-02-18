@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="desclamp",
+    name="DESC-Lamp",
     version="0.0.1",
     author="Remy Joseph",
     author_email="remy.joseph11@gmail.com",
@@ -20,7 +20,7 @@ setuptools.setup(
         "License :: BSD 3-Clause License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "desclamp"},
-    packages=setuptools.find_packages(where="desclamp"),
+    package_dir={"": "DESC-Lamp"},
+    packages=setuptools.find_packages(where="DESC-Lamp"),
     python_requires=">=3.6",
 )
