@@ -137,12 +137,12 @@ class Candidates:
         
         return cutouts
     
-    def display_cutouts(self, cutouts, cutout_size=100, data_range = 2, q = 8):
+    def display_cutouts(self, cutouts, cutout_size=100, figsize=(10,10), data_range = 2, q = 8):
         """ Displays RGB image of cutouts on a mosaic
         """
         n = len(cutouts)
 
-        fig = plt.figure(figsize=(36, 36), dpi=100)
+        fig = plt.figure(figsize=figsize, dpi=100)
         if int(np.sqrt(n))**2 == int(n):
             l = int(np.sqrt(n))
         else:
@@ -156,7 +156,7 @@ class Candidates:
             image_rgb = rgb.makeRGB(*image, dataRange = data_range, Q=q)
     
             ax = plt.subplot(gs[i], 
-                             projection=WCS(cutout.exposure[0].getWcs().getFitsMetadata()), 
+                             #projection=WCS(cutout.exposure[0].getWcs().getFitsMetadata()), 
                              label=str(cutout.catalog["objectId"])
                             )
             ax.imshow(image_rgb, origin='lower')
