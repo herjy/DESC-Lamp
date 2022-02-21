@@ -21,6 +21,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     package_dir={"": "desclamp"},
-    packages=setuptools.find_packages(where="desclamp"),
+    packages=setuptools.find_packages(where="./"),
     python_requires=">=3.6",
 )
