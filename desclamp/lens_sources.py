@@ -55,7 +55,7 @@ class LensedSource:
     def lens_source(self, lens_models, hr_factor, **kwargs):
         assert self.image is not None, "Please provide a source image."
 
-        kwargs_data_high_res = sim_util.data_configure_simple(slef.shape*hr_factor, self.pix/hr_factor)
+        kwargs_data_high_res = sim_util.data_configure_simple(self.shape*hr_factor, self.pix/hr_factor)
         data_high_res = ImageData(**kwargs_data_high_res)
 
         lensModel = LensModel(lens_models)
