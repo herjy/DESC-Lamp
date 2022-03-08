@@ -2,6 +2,8 @@
 numpy>=1.17
 astropy
 matplotlib
+git+https://github.com/LSSTDESC/gcr-catalogs.git
+git+https://github.com/sibirrer/lenstronomy.git
 galsim
 pandas
 
