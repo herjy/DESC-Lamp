@@ -45,6 +45,8 @@ jobs:
         python -m pip install --upgrade pytest
         python -m pip install flake8 pytest pytest-cov coveralls
         
+        pip install --no-deps git+https://github.com/LSSTDESC/gcr-catalogs.git
+        
         python -m pip install .
     - name: Lint with flake8
       run: |
