@@ -4,7 +4,6 @@ astropy
 matplotlib
 lenstronomy
 galsim
-git+git://github.com/LSSTDESC/gcr-catalogs#egg=GCRCatalogs
 pandas
 
 # For tests 
