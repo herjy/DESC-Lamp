@@ -3,7 +3,7 @@ numpy>=1.17
 astropy
 matplotlib
 git+git://github.com/LSSTDESC/gcr-catalogs#egg=GCRCatalogs
-git+git://github.com/sibirrer/lenstronomy#egg=lenstronomy
+lenstronomy
 galsim
 pandas
 
