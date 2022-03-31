@@ -1,5 +1,5 @@
 # DESC-Lamp
-DESC Lensing access and Machine learning Pipeline. This repo hosts the sections of the DESC and SLSC Strong Lensing (SL) pipeline that enable finding strong gravitational lens systems.
+DESC Lensing Access and Machine learning Pipeline. This repo hosts the sections of the DESC and SLSC Strong Lensing (SL) pipeline that enable finding strong gravitational lens systems.
 
 This is achieved by providing an interface that allows catalog-based preselection of lens candidates and that extract postage stamps of candidates. 
 
