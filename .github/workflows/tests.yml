@@ -46,7 +46,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_HUB }}/simplewhale:latest
+        tags: lsstdesc/td-env:latest
 
     - name: Install dependencies
       shell: bash -l {0}
