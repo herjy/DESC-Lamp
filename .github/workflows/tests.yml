@@ -45,7 +45,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_REPO }}:latest
+        tags: ${{ secrets.DOCKER_REPO }}/td-env::latest
 
     - name: Install dependencies
       shell: bash -l {0}
