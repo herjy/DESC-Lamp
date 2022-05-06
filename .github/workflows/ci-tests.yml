@@ -17,8 +17,6 @@ jobs:
         pyver: [3.8]
     runs-on: ubuntu-latest
     steps:
-    - name: Fix up git URLs
-      run: echo -e '[url "https://github.com/"]\n  insteadOf = "git://github.com/"' >> ~/.gitconfig
     - name: Cancel Previous Runs
       uses: styfle/cancel-workflow-action@0.9.0
       with:
