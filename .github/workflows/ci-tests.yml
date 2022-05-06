@@ -20,16 +20,22 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: "3.8"
+    - name: Fix up git URLs
+      run: echo -e '[url "https://github.com/"]\n  insteadOf = "git://github.com/"' >> ~/.gitconfig
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install --upgrade pytest
         python -m pip install flake8 pytest pytest-cov coveralls
+        
+        conda config --set always_yes yes
+        conda install --quiet --yes mamba
+        mamba install --quiet --yes --file CI_requirements.txt
+        mamba install -q -y stackvana=0 lsstdesc-weaklensingdeblending
 
         pip install --no-deps git://github.com/sibirrer/lenstronomy.git
         pip install --no-deps git://github.com/LSSTDESC/gcr-catalogs.git
         
-        if [ -f CI_requirements.txt ]; then pip install -r CI_requirements.txt; fi
         python -m pip install .
     - name: Lint with flake8
       run: |
