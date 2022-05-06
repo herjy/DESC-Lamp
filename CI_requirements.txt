@@ -1,0 +1,10 @@
+
+numpy>=1.17
+astropy
+matplotlib
+galsim
+git+git://github.com/LSSTDESC/gcr-catalogs#egg=GCRCatalogs
+pandas
+
+# For tests 
+pytest

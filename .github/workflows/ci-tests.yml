@@ -25,9 +25,11 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install --upgrade pytest
         python -m pip install flake8 pytest pytest-cov coveralls
+
+        pip install --no-deps git+https://github.com/sibirrer/lenstronomy.git
+        pip install --no-deps git+https://github.com/LSSTDESC/gcr-catalogs.git
         
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        if [ -f requirements.txt ]; then pip install -r test_requirements.txt; fi
+        if [ -f requirements.txt ]; then pip install -r CI-requirements.txt; fi
         python -m pip install .
     - name: Lint with flake8
       run: |
