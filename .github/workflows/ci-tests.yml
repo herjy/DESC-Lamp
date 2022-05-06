@@ -44,6 +44,7 @@ jobs:
         mamba install -q -y stackvana=0 lsstdesc-weaklensingdeblending
 
         pip install --no-deps git://github.com/sibirrer/lenstronomy.git
+        pip install --no-deps git://github.com/LSSTDESC/gcr-catalogs.git
         
         python -m pip install .
     - name: Lint with flake8
