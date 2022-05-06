@@ -26,8 +26,8 @@ jobs:
         python -m pip install --upgrade pytest
         python -m pip install flake8 pytest pytest-cov coveralls
 
-        pip install --no-deps git+https://github.com/sibirrer/lenstronomy.git
-        pip install --no-deps git+https://github.com/LSSTDESC/gcr-catalogs.git
+        pip install --no-deps git://github.com/sibirrer/lenstronomy.git
+        pip install --no-deps git://github.com/LSSTDESC/gcr-catalogs.git
         
         if [ -f CI_requirements.txt ]; then pip install -r CI_requirements.txt; fi
         python -m pip install .
